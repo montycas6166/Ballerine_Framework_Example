@@ -14,20 +14,22 @@ class _WebViewScreenState extends State<WebViewScreen> {
   InAppWebViewController? webViewController;
   double progress = 0;
   InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
-    crossPlatform: InAppWebViewOptions(
-      useShouldOverrideUrlLoading: true,
-      mediaPlaybackRequiresUserGesture: false,
-      allowFileAccessFromFileURLs: true,
-      allowUniversalAccessFromFileURLs: true,
-    ),
-    android: AndroidInAppWebViewOptions(
-      useHybridComposition: true,
-      allowFileAccess: true,
-    ),
-    ios: IOSInAppWebViewOptions(
-      allowsInlineMediaPlayback: true,
-    ),
-  );
+      crossPlatform: InAppWebViewOptions(
+        useShouldOverrideUrlLoading: true,
+        allowFileAccessFromFileURLs: true,
+        cacheEnabled: true,
+        javaScriptCanOpenWindowsAutomatically: true,
+        mediaPlaybackRequiresUserGesture: false,
+      ),
+      android: AndroidInAppWebViewOptions(
+        useHybridComposition: true,
+        useShouldInterceptRequest: true,
+        allowFileAccess: true,
+      ),
+      ios: IOSInAppWebViewOptions(
+        allowsInlineMediaPlayback: true,
+      ));
+
 
   @override
   void initState() {
@@ -43,6 +45,14 @@ class _WebViewScreenState extends State<WebViewScreen> {
           children: [
             InAppWebView(
               key: webViewKey,
+              initialOptions: options,
+              androidOnPermissionRequest: (InAppWebViewController controller,
+                  String origin, List<String> resources) async {
+                print('CHECK ' + resources.toString());
+                return PermissionRequestResponse(
+                    resources: resources,
+                    action: PermissionRequestResponseAction.GRANT);
+              },
               onWebViewCreated: (controller) {
                 webViewController = controller;
                 webViewController?.loadUrl(
@@ -62,7 +72,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
               onProgressChanged: (controller, progress) {
                 if (progress == 100) {}
                 setState(
-                  () {
+                      () {
                     this.progress = progress / 100;
                   },
                 );

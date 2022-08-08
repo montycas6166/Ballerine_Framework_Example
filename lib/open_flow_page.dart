@@ -22,7 +22,7 @@ class _OpenFlowScreenState extends State<OpenFlowScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   params = null;
                   Navigator.push(
                     context,
